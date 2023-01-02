@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	fileorg "github.com/AYehia0/file-org"
+	fileorg "github.com/AYehia0/file-org/cmd/file-org"
 	//fileorg "github.com/AYehia0/file-org"
 )
 
