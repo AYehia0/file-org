@@ -76,7 +76,7 @@ func createTargetDirs(dirs []string, orgDir string) {
 	}
 }
 
-func moveFiles(files map[string][]string, orgDir string) {
+func moveFiles(files map[string][]string, dirtyPath string, orgDir string) {
 	for ext, files_ := range files {
 
 		// match dir
@@ -87,8 +87,7 @@ func moveFiles(files map[string][]string, orgDir string) {
 		}
 
 		for _, file := range files_ {
-			path, _ := os.Getwd()
-			currentPath := filepath.Join(path, file)
+			currentPath := filepath.Join(dirtyPath, file)
 			newPath := filepath.Join(orgDir, targetDir)
 			err := os.Rename(currentPath, filepath.Join(newPath, file))
 
@@ -102,5 +101,5 @@ func moveFiles(files map[string][]string, orgDir string) {
 func Run(filesPath string, orgDir string) {
 	files := scanFiles(filesPath)
 	createTargetDirs(maps.Keys(EXT_FILES), orgDir)
-	moveFiles(files, orgDir)
+	moveFiles(files, filesPath, orgDir)
 }
