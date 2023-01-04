@@ -3,6 +3,7 @@ package fileorg
 import (
 	"log"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strings"
 
@@ -21,7 +22,26 @@ func matchExt(a string, exts map[string][]string) string {
 	return ""
 }
 
+// expand the relative path that starts with ~ (ex : ~/path/ --> /home/{username}/path/)
+func expandPath(path string) (string, error) {
+	if len(path) == 0 || path[0] != '~' {
+		return path, nil
+	}
+
+	usr, err := user.Current()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(usr.HomeDir, path[1:]), nil
+
+}
+
+// The path must be an existing path in the system and must reference a directory not a file (ex: /home/name/somefile)
 func isValidPath(path string) bool {
+	path, err := expandPath(path)
+	if err != nil {
+		return false
+	}
 	if stat, err := os.Stat(path); err == nil && stat.IsDir() {
 		return true
 	}
@@ -76,7 +96,8 @@ func createTargetDirs(dirs []string, orgDir string) {
 	}
 }
 
-func moveFiles(files map[string][]string, dirtyPath string, orgDir string) {
+func moveFiles(files map[string][]string, dirtyPath string, orgDir string) map[string][]string {
+	newPaths := make(map[string][]string, 0)
 	for ext, files_ := range files {
 
 		// match dir
@@ -91,11 +112,13 @@ func moveFiles(files map[string][]string, dirtyPath string, orgDir string) {
 			newPath := filepath.Join(orgDir, targetDir)
 			err := os.Rename(currentPath, filepath.Join(newPath, file))
 
+			newPaths[targetDir] = append(newPaths[targetDir], filepath.Join(newPath, file))
 			if err != nil {
 				log.Fatalf("Something went wrong while Moving %s : Error %s\n", currentPath, err)
 			}
 		}
 	}
+	return newPaths
 }
 
 func Run(filesPath string, orgDir string) {
