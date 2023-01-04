@@ -20,7 +20,7 @@ go install github.com/AYehia/file-org@latest
 ```
 
 # TODO
-- [ ] Add Tests.
+- [x] Add Tests.
 - [ ] Use structs.
 - [ ] Remove some dependencies.
 - [x] Make use of the really nice `vim-go` docs
